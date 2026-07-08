@@ -5,7 +5,7 @@ Creates a reusable SQLAlchemy engine for connecting to PostgreSQL.
 """
 
 from sqlalchemy import create_engine
-from config import DB_CONFIG
+from src.config import DB_CONFIG
 
 
 # Build PostgreSQL connection URL from environment variables.

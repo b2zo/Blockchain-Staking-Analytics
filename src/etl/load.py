@@ -4,8 +4,8 @@ Load module.
 Loads transformed data into PostgreSQL.
 """
 
-from db_connection import get_engine
-from logger import logger
+from src.database.db_connection import get_engine
+from src.monitoring.logger import logger
 
 
 def load_dataframe(df, table_name):

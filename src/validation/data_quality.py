@@ -7,7 +7,7 @@ or broken business rules.
 """
 
 import pandas as pd
-from db_connection import get_engine
+from src.database.db_connection import get_engine
 
 
 def run_quality_checks():
