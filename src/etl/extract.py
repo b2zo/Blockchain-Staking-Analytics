@@ -159,6 +159,13 @@ def generate_reward_transactions(
     # Add position_id based on DataFrame row order.
     positions = positions.reset_index(drop=True).copy()
     positions["position_id"] = positions.index + 1
+    
+    # Ensure lookup keys have consistent data types.
+    validator_metrics = validator_metrics.copy()
+    validator_metrics["validator_id"] = validator_metrics["validator_id"].astype(int)
+    validator_metrics["metric_date"] = pd.to_datetime(
+        validator_metrics["metric_date"]
+    ).dt.date
 
     # Build fast lookup for validator APR by validator/date.
     metrics_lookup = validator_metrics.set_index(
@@ -168,16 +175,14 @@ def generate_reward_transactions(
     for _ in range(n):
         position = positions.sample(1).iloc[0]
 
-        reward_date = START_DATE + timedelta(
-            days=int(np.random.randint(0, DAYS))
-        )
+        reward_date = (START_DATE + timedelta(days=int(np.random.randint(0, DAYS)))).date()
 
         apr = metrics_lookup.loc[
-            (position["validator_id"], reward_date)
+            (int(position["validator_id"]), reward_date)
         ]
 
         reward_amount = (
-            position["amount_staked"]
+            float(position["amount_staked"])
             * (apr / 100)
             / 365
         )

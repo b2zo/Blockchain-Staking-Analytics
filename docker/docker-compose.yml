@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: staking_postgres
+    restart: always
+    environment:
+      POSTGRES_DB: staking_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - staking_postgres_data:/var/lib/postgresql/data
+      - ../sql/create_tables.sql:/docker-entrypoint-initdb.d/01_create_tables.sql
+      - ../sql/create_views.sql:/docker-entrypoint-initdb.d/02_create_views.sql
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: staking_pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@staking.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+
+volumes:
+  staking_postgres_data:

@@ -2,6 +2,17 @@
 Project-wide constants.
 """
 
+# Required database tables
+REQUIRED_TABLES = [
+    "networks",
+    "delegators",
+    "validators",
+    "staking_positions",
+    "reward_transactions",
+    "daily_validator_metrics",
+    "daily_wallet_metrics",
+]
+
 NETWORKS = [
     "Ethereum",
     "Solana",

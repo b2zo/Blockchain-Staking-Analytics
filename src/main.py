@@ -4,6 +4,7 @@ Main ETL entry point for the Blockchain Staking Analytics project.
 This script generates synthetic blockchain staking data, transforms it,
 loads it into PostgreSQL, and runs basic data quality checks.
 """
+from src.database.setup_database import setup_database
 
 from src.etl.extract import (
     generate_networks,
@@ -25,7 +26,7 @@ from src.etl.transform import (
     transform_daily_wallet_metrics,
 )
 
-from src.etl.load import load_dataframe
+from src.etl.load import incremental_load
 from src.validation.data_quality import run_quality_checks
 from src.monitoring.logger import logger
 
@@ -36,28 +37,30 @@ def main():
     try:
         logger.info("ETL Pipeline Started")
         print("Starting Blockchain Staking Analytics ETL...")
+        logger.info("Setting up database schema.")
+        setup_database()
 
         # Generate, transform, and load network reference data.
         networks = transform_networks(generate_networks())
-        load_dataframe(networks, "networks")
+        incremental_load(networks, "networks", ["network_name"])
 
         # Generate, transform, and load wallet/delegator data.
         delegators = transform_delegators(generate_delegators())
-        load_dataframe(delegators, "delegators")
+        incremental_load(delegators, "delegators", ["wallet_address"])
 
         # Generate, transform, and load validator data.
         validators = transform_validators(generate_validators())
-        load_dataframe(validators, "validators")
+        incremental_load(validators, "validators", ["validator_name"])
 
         # Generate, transform, and load staking position data.
         positions = transform_staking_positions(generate_staking_positions())
-        load_dataframe(positions, "staking_positions")
+        incremental_load(positions, "staking_positions", ["delegator_id", "validator_id", "amount_staked", "start_date"],)
 
         # Generate, transform, and load validator daily metrics.
         validator_metrics = transform_daily_validator_metrics(
             generate_daily_validator_metrics()
         )
-        load_dataframe(validator_metrics, "daily_validator_metrics")
+        incremental_load(validator_metrics, "daily_validator_metrics", ["validator_id", "metric_date"],)
 
         # Generate, transform, and load staking reward transactions.
         rewards = transform_reward_transactions(
@@ -66,7 +69,7 @@ def main():
                 validator_metrics,
             )
         )
-        load_dataframe(rewards, "reward_transactions")
+        incremental_load(rewards, "reward_transactions", ["position_id", "reward_date", "reward_amount"],)
 
         # Generate, transform, and load wallet daily metrics.
         wallet_metrics = transform_daily_wallet_metrics(
@@ -75,7 +78,7 @@ def main():
                 rewards,
             )
         )
-        load_dataframe(wallet_metrics, "daily_wallet_metrics")
+        incremental_load(wallet_metrics, "daily_wallet_metrics", ["delegator_id", "metric_date"],)
 
         # Run quality checks after all tables have been loaded.
         logger.info("Running data quality checks.")
