@@ -1,10 +1,5 @@
 """
 Airflow DAG for Blockchain Staking Analytics ETL.
-
-This DAG orchestrates the full ETL pipeline:
-1. Set up database schema
-2. Run staking analytics ETL
-3. Run data quality checks
 """
 
 from datetime import datetime, timedelta
@@ -13,7 +8,16 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 
 from src.database.setup_database import setup_database
-from src.main import main
+from src.etl.pipeline import (
+    load_networks,
+    load_delegators,
+    load_validators,
+    load_positions,
+    load_validator_metrics,
+    load_rewards,
+    load_wallet_metrics,
+)
+from src.validation.data_quality import run_quality_checks
 
 
 default_args = {
@@ -39,9 +43,62 @@ with DAG(
         python_callable=setup_database,
     )
 
-    run_etl_task = PythonOperator(
-        task_id="run_staking_etl",
-        python_callable=main,
+    networks_task = PythonOperator(
+        task_id="load_networks",
+        python_callable=load_networks,
     )
 
-    setup_database_task >> run_etl_task
+    delegators_task = PythonOperator(
+        task_id="load_delegators",
+        python_callable=load_delegators,
+    )
+
+    validators_task = PythonOperator(
+        task_id="load_validators",
+        python_callable=load_validators,
+    )
+
+    positions_task = PythonOperator(
+        task_id="load_staking_positions",
+        python_callable=load_positions,
+    )
+
+    validator_metrics_task = PythonOperator(
+        task_id="load_validator_metrics",
+        python_callable=load_validator_metrics,
+    )
+
+    rewards_task = PythonOperator(
+        task_id="load_rewards",
+        python_callable=load_rewards,
+    )
+
+    wallet_metrics_task = PythonOperator(
+        task_id="load_wallet_metrics",
+        python_callable=load_wallet_metrics,
+    )
+
+    quality_checks_task = PythonOperator(
+        task_id="run_data_quality_checks",
+        python_callable=run_quality_checks,
+    )
+
+    setup_database_task >> [networks_task, delegators_task, validators_task]
+
+    [delegators_task, validators_task] >> positions_task
+
+    validators_task >> validator_metrics_task
+
+    [positions_task, validator_metrics_task] >> rewards_task
+
+    [positions_task, rewards_task] >> wallet_metrics_task
+
+    [
+        networks_task,
+        delegators_task,
+        validators_task,
+        positions_task,
+        validator_metrics_task,
+        rewards_task,
+        wallet_metrics_task,
+    ] >> quality_checks_task
