@@ -17,17 +17,25 @@ import numpy as np
 import pandas as pd
 
 from src.constants import NETWORKS, TOKENS, VALIDATOR_STATUS
+from src.config_loader import load_config
 
 
 np.random.seed(42)
 
-START_DATE = datetime(2024, 1, 1)
-DAYS = 365
-DELEGATOR_COUNT = 5000
-VALIDATOR_COUNT = 100
-POSITION_COUNT = 20000
-REWARD_COUNT = 150000
-WALLET_METRIC_COUNT = 50000
+CONFIG = load_config()
+
+START_DATE = datetime.strptime(
+    CONFIG["pipeline"]["start_date"],
+    "%Y-%m-%d",
+)
+
+DAYS = CONFIG["pipeline"]["days"]
+
+DELEGATOR_COUNT = CONFIG["data_generation"]["delegator_count"]
+VALIDATOR_COUNT = CONFIG["data_generation"]["validator_count"]
+POSITION_COUNT = CONFIG["data_generation"]["position_count"]
+REWARD_COUNT = CONFIG["data_generation"]["reward_count"]
+WALLET_METRIC_COUNT = CONFIG["data_generation"]["wallet_metric_count"]
 
 
 def generate_networks():
