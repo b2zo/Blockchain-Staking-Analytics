@@ -1,0 +1,11 @@
+pipeline:
+  name: Blockchain Staking Analytics
+  start_date: "2024-01-01"
+  days: 365
+
+data_generation:
+  delegator_count: 5000
+  validator_count: 100
+  position_count: 20000
+  reward_count: 150000
+  wallet_metric_count: 50000
