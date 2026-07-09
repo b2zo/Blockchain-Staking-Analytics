@@ -26,3 +26,9 @@ data/exports/
 .DS_Store
 Thumbs.db
 .vscode/
+
+# Airflow runtime files
+airflow_home/
+airflow.db
+airflow.cfg
+webserver_config.py
