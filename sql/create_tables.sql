@@ -134,6 +134,21 @@ CREATE TABLE daily_wallet_metrics (
 );
 
 -- ============================================================
+-- ETL Run Monitoring
+-- ============================================================
+
+CREATE TABLE etl_run_log (
+    run_id SERIAL PRIMARY KEY,
+    pipeline_name VARCHAR(100) NOT NULL,
+    start_time TIMESTAMP NOT NULL,
+    end_time TIMESTAMP,
+    status VARCHAR(30) NOT NULL,
+    rows_loaded INT DEFAULT 0,
+    error_message TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ============================================================
 -- Indexes
 -- ============================================================
 

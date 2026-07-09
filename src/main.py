@@ -30,15 +30,25 @@ from src.etl.load import incremental_load
 from src.validation.data_quality import run_quality_checks
 from src.monitoring.logger import logger
 
+from src.monitoring.etl_monitor import (
+    start_etl_run,
+    finish_etl_run,
+)
+
 
 def main():
     """Run the full ETL pipeline."""
     
+    run_id = None
+    
     try:
         logger.info("ETL Pipeline Started")
         print("Starting Blockchain Staking Analytics ETL...")
+        
         logger.info("Setting up database schema.")
         setup_database()
+        
+        run_id = start_etl_run("Blockchain Staking Analytics")
 
         # Generate, transform, and load network reference data.
         networks = transform_networks(generate_networks())
@@ -87,6 +97,11 @@ def main():
 
         logger.info("ETL Pipeline Finished Successfully")
         
+        finish_etl_run(
+            run_id=run_id,
+            status="SUCCESS",
+        )
+        
         print("ETL Finished Successfully")
 
     except Exception as error:
@@ -95,6 +110,12 @@ def main():
         "Pipeline execution failed: %s",
         error
         )
+        if run_id is not None:
+            finish_etl_run(
+                run_id=run_id,
+                status="FAILED",
+                error_message=str(error),
+            )
 
         print(f"\nPipeline failed: {error}")
 
