@@ -47,10 +47,10 @@ def transform_delegators(df: pd.DataFrame) -> pd.DataFrame:
     """
 
     # Remove duplicated wallet addresses
-    df = df.drop_duplicates(subset="wallet_address")
+    df = df.drop_duplicates(subset=["wallet_address"]).copy()
 
     # Ensure wallet addresses are lowercase
-    df["wallet_address"] = df["wallet_address"].str.lower()
+    df.loc[:, "wallet_address"] = df["wallet_address"].str.lower()
 
     return df
 

@@ -11,6 +11,7 @@ REQUIRED_TABLES = [
     "reward_transactions",
     "daily_validator_metrics",
     "daily_wallet_metrics",
+    "etl_run_log",
 ]
 
 NETWORKS = [
