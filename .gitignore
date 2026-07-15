@@ -7,6 +7,8 @@ venv/
 # Environment / secrets
 .env
 *.env
+.env.*
+!.env.example
 config/config.env
 
 # Logs
@@ -22,6 +24,13 @@ data/exports/
 *.tmp
 *.bak
 
+# Python cache
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+
 # OS / IDE
 .DS_Store
 Thumbs.db
@@ -32,3 +41,38 @@ airflow_home/
 airflow.db
 airflow.cfg
 webserver_config.py
+
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Docker
+docker-compose.override.yml
+*.pid
+
+# PostgreSQL
+*.db
+*.sqlite3
+*.sql.bak
+
+# macOS
+.AppleDouble
+.LSOverride
+
+# Windows
+Desktop.ini
+
+# Python packaging
+dist/
+build/
+*.egg-info/
+
+# Testing
+.cache/
+
+# IDE
+.idea/
+
+# Temporary
+*.swp
+*.swo
