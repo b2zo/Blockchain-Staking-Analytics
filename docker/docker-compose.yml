@@ -1,32 +1,52 @@
-version: "3.9"
-
 services:
   postgres:
     image: postgres:16
     container_name: staking_postgres
-    restart: always
+    restart: unless-stopped
+
     environment:
       POSTGRES_DB: staking_db
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-    ports:
-      - "5432:5432"
-    volumes:
-      - staking_postgres_data:/var/lib/postgresql/data
-      - ../sql/create_tables.sql:/docker-entrypoint-initdb.d/01_create_tables.sql
-      - ../sql/create_views.sql:/docker-entrypoint-initdb.d/02_create_views.sql
+      POSTGRES_PASSWORD: postgres
 
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: staking_pgadmin
-    restart: always
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@staking.com
-      PGADMIN_DEFAULT_PASSWORD: admin
     ports:
-      - "5050:80"
+      
+      - "5433:5432"
+
+    volumes:
+      # Preserve PostgreSQL data between container restarts.
+      - staking_postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+      # Confirm that PostgreSQL is accepting connections.
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U postgres -d staking_db",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  etl:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+
+    container_name: staking_etl
+
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+
+    environment:
+      
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: staking_db
+      DB_USER: postgres
+      DB_PASSWORD: postgres
 
 volumes:
   staking_postgres_data:
