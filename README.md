@@ -35,25 +35,6 @@ The solution incorporates modern Data Engineering practices including:
 
 ---
 
-# Data Flow
-
-```mermaid
-flowchart LR
-    A[Synthetic Blockchain Data] --> B[Python Extraction]
-    B --> C[Transformation and Validation]
-    C --> D[Incremental Loading]
-    D --> E[(PostgreSQL Data Warehouse)]
-    E --> F[Analytical SQL Views]
-    F --> G[Power BI Dashboard]
-
-    H[Apache Airflow] -. Orchestrates .-> B
-    I[Docker Compose] -. Hosts .-> D
-    I -. Runs .-> H
-    J[GitHub Actions] -. Tests and Builds .-> B
-```
-
----
-
 # Technology Stack
 
 | Category | Technology |
@@ -82,7 +63,7 @@ Blockchain-Staking-Analytics
 │
 ├── docker/
 ├── docs/
-├── logs/
+├── sql/
 ├── src/
 │   ├── etl/
 │   ├── monitoring/
@@ -94,6 +75,7 @@ Blockchain-Staking-Analytics
 ├── .github/
 │   └── workflows/
 ├── Dockerfile
+├── CHANGELOG.md
 ├── requirements.txt
 └── README.md
 ```
@@ -298,12 +280,18 @@ Clone repository
 
 ```bash
 git clone https://github.com/b2zo/Blockchain-Staking-Analytics.git
+cd Blockchain-Staking-Analytics
+
+python -m venv .venv
+
+.venv\Scripts\activate
 ```
 
 Install dependencies
 
 ```bash
 pip install -r requirements.txt
+python -m pytest
 ```
 
 Run locally
