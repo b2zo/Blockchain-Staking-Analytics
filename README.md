@@ -39,23 +39,17 @@ The solution incorporates modern Data Engineering practices including:
 
 ```mermaid
 flowchart LR
+    A[Synthetic Blockchain Data] --> B[Python Extraction]
+    B --> C[Transformation and Validation]
+    C --> D[Incremental Loading]
+    D --> E[(PostgreSQL Data Warehouse)]
+    E --> F[Analytical SQL Views]
+    F --> G[Power BI Dashboard]
 
-A[Generate Synthetic Blockchain Data]
---> B[Transform Data]
-
-B --> C[Incremental ETL]
-
-C --> D[(PostgreSQL)]
-
-D --> E[Data Quality Checks]
-
-E --> F[ETL Monitoring]
-
-F --> G[Apache Airflow]
-
-G --> H[Docker Container]
-
-H --> I[GitHub Actions CI]
+    H[Apache Airflow] -. Orchestrates .-> B
+    I[Docker Compose] -. Hosts .-> D
+    I -. Runs .-> H
+    J[GitHub Actions] -. Tests and Builds .-> B
 ```
 
 ---
